@@ -1,0 +1,445 @@
+/* ── Variáveis de design ──────────────────────────────────── */
+:root {
+  --bg:         #07090f;
+  --panel-bg:   rgba(8, 12, 22, 0.93);
+  --panel-bd:   rgba(50, 110, 200, 0.25);
+  --accent:     #3a8fe8;
+  --ok:         #30d890;
+  --warn:       #f0a020;
+  --danger:     #e04040;
+  --text:       #8ab4d8;
+  --text-hi:    #dceeff;
+  --mono:       'Courier New', monospace;
+  --sans:       'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+canvas {
+  display: block;
+  position: fixed;
+  top: 44px;
+  left: 0;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Barra Superior
+   ════════════════════════════════════════════════════════════ */
+#topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 44px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 20px;
+  background: rgba(6, 9, 16, 0.88);
+  border-bottom: 1px solid var(--panel-bd);
+  backdrop-filter: blur(12px);
+  font-family: var(--sans);
+}
+
+.brand {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.brand span { color: var(--text-hi); }
+
+.sep {
+  width: 1px;
+  height: 18px;
+  background: var(--panel-bd);
+}
+
+.tag {
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+/* Indicadores LED na barra */
+.dot-ok, .dot-warn {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+.dot-ok   {
+   background: var(--ok);   
+   box-shadow: 0 0 6px var(--ok);
+  }
+
+.dot-warn { 
+  background: var(--warn); 
+  box-shadow: 0 0 6px var(--warn); 
+}
+
+/* KPIs lado direito */
+.ml {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.kpi { 
+  text-align: right; 
+}
+
+.kpi-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-hi);
+  font-family: var(--mono);
+}
+.kpi-lbl {
+  font-size: 8px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+#btn-reset {
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text);
+  border: 1px solid var(--panel-bd);
+  border-radius: 4px;
+  padding: 5px 12px;
+  cursor: pointer;
+  background: transparent;
+  transition: color .2s, border-color .2s;
+  font-family: var(--sans);
+}
+#btn-reset:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ════════════════════════════════════════════════════════════
+   Dica de Interação (rodapé)
+   ════════════════════════════════════════════════════════════ */
+#hint {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: 7px 20px;
+  background: rgba(6, 9, 16, 0.8);
+  border: 1px solid var(--panel-bd);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+/* ════════════════════════════════════════════════════════════
+   Tooltip de hover
+   ════════════════════════════════════════════════════════════ */
+#tooltip {
+  position: fixed;
+  pointer-events: none;
+  z-index: 60;
+  padding: 6px 12px;
+  background: rgba(6, 9, 16, 0.88);
+  border: 1px solid var(--panel-bd);
+  border-radius: 5px;
+  backdrop-filter: blur(8px);
+  font-size: 10px;
+  color: var(--text-hi);
+  font-family: var(--sans);
+  white-space: nowrap;
+  transform: translate(-50%, -120%);
+  opacity: 0;
+  transition: opacity .15s;
+}
+#tooltip.show { opacity: 1; }
+
+/* ════════════════════════════════════════════════════════════
+   Painel lateral de Status
+   ════════════════════════════════════════════════════════════ */
+#panel {
+  position: fixed;
+  top: 44px; right: 0;
+  width: 320px;
+  height: calc(100vh - 44px);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--panel-bg);
+  border-left: 1px solid var(--panel-bd);
+  backdrop-filter: blur(16px);
+  font-family: var(--sans);
+  transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.22, .68, 0, 1.2);
+}
+#panel.open { transform: translateX(0); }
+
+/* Cabeçalho do painel */
+#panel-header {
+  position: relative;
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--panel-bd);
+}
+#panel-brand {
+  font-size: 8px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+#panel-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-hi);
+  line-height: 1.2;
+}
+#panel-model {
+  font-size: 11px;
+  color: var(--text);
+  margin-top: 3px;
+  letter-spacing: .04em;
+}
+#panel-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--panel-bd);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  font-size: 14px;
+  transition: background .2s, color .2s;
+}
+#panel-close:hover {
+  background: rgba(255, 255, 255, .12);
+  color: var(--text-hi);
+}
+
+/* Pills de status (DeviceNet / MAC / Estado) */
+#panel-status-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--panel-bd);
+}
+.status-pill {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 6px;
+  text-align: center;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid var(--panel-bd);
+}
+.sp-val {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+.sp-lbl {
+  font-size: 8px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-top: 2px;
+}
+.pill-ok   .sp-val { 
+  color: var(--ok); 
+}
+.pill-warn .sp-val { 
+  color: var(--warn);
+ }
+.pill-info .sp-val {
+   color: var(--accent); 
+  }
+
+/* Corpo com scroll */
+#panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+#panel-body::-webkit-scrollbar { 
+  width: 4px; 
+}
+#panel-body::-webkit-scrollbar-track { 
+  background: transparent; 
+}
+#panel-body::-webkit-scrollbar-thumb {
+  background: var(--panel-bd);
+  border-radius: 2px;
+}
+
+/* Títulos de seção */
+.section-title {
+  font-size: 8px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 14px 0 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--panel-bd);
+}
+
+/* Linhas de dados chave → valor */
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(50, 110, 200, .08);
+}
+.data-row:last-child { 
+  border-bottom: none; 
+}
+.data-key { 
+  font-size: 11px; 
+  color: var(--text); 
+}
+.data-val {
+  font-size: 11px;
+  color: var(--text-hi);
+  font-family: var(--mono);
+  font-weight: 500;
+}
+.data-val.ok   { 
+  color: var(--ok); 
+}
+.data-val.warn { 
+  color: var(--warn); 
+}
+.data-val.bad  { 
+  color: var(--danger); 
+}
+
+/* Barras de consumo (gauges) */
+.gauge-wrap {
+   margin: 10px 0; 
+  }
+.gauge-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+.gauge-label span {
+  color: var(--text-hi);
+  font-family: var(--mono);
+}
+.gauge-track {
+  height: 6px;
+  background: rgba(255, 255, 255, .08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .6s ease;
+}
+.gauge-blue  { 
+  background: linear-gradient(90deg, #1a5fa0, #3a8fe8); 
+}
+.gauge-green { 
+  background: linear-gradient(90deg, #0a8050, #30d890); 
+}
+.gauge-amber { 
+  background: linear-gradient(90deg, #906000, #f0a020); 
+}
+
+/* Terminal de log de eventos */
+#log-term {
+  margin: 10px 0;
+  height: 100px;
+  overflow-y: auto;
+  padding: 10px;
+  background: rgba(0, 5, 0, .5);
+  border: 1px solid rgba(0, 200, 100, .15);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #30d890;
+  line-height: 1.7;
+}
+#log-term::-webkit-scrollbar {
+   width: 3px; 
+}
+#log-term::-webkit-scrollbar-thumb {
+   background: rgba(0, 200, 100, .2); 
+}
+.log-ts {
+  color: #0a7030;
+  margin-right: 6px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Tela de Carregamento
+   ════════════════════════════════════════════════════════════ */
+#loading {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: opacity .7s;
+}
+#loading h1 {
+  font-size: 11px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-family: var(--sans);
+  margin-bottom: 20px;
+}
+#loading-track {
+  width: 240px;
+  height: 2px;
+  background: rgba(255, 255, 255, .06);
+  border-radius: 1px;
+  overflow: hidden;
+}
+#loading-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width .25s;
+}
+#loading-msg {
+  margin-top: 12px;
+  font-size: 9px;
+  letter-spacing: .1em;
+  color: rgba(100, 150, 200, .45);
+  font-family: var(--sans);
+}

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WEG — Linha de Envasamento DeviceNet</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ── Tela de carregamento ─────────────────────────────── -->
+  <div id="loading">
+    <h1>WEG — Linha de Envasamento</h1>
+    <div id="loading-track">
+      <div id="loading-fill"></div>
+    </div>
+    <p id="loading-msg">Inicializando ambiente 3D...</p>
+  </div>
+
+  <!-- ── Barra superior (HMI) ─────────────────────────────── -->
+  <div id="topbar">
+    <div class="brand"><span>WEG</span> DeviceNet HMI</div>
+    <div class="sep"></div>
+    <div class="tag"><span class="dot-ok"></span>Linha 01 — Operacional</div>
+    <div class="sep"></div>
+    <div class="tag"><span class="dot-ok"></span>DeviceNet 125 kbps</div>
+
+    <div class="ml">
+      <div class="kpi">
+        <div class="kpi-val" id="kpi-vel">60.0 Hz</div>
+        <div class="kpi-lbl">Velocidade</div>
+      </div>
+      <div class="sep"></div>
+      <div class="kpi">
+        <div class="kpi-val" id="kpi-pkts">0</div>
+        <div class="kpi-lbl">Frames CAN</div>
+      </div>
+      <div class="sep"></div>
+      <button id="btn-reset">↩ Visão Geral</button>
+    </div>
+  </div>
+
+  <!-- ── Dica de interação ─────────────────────────────────── -->
+  <div id="hint">
+    Clique em um dispositivo para inspecionar &nbsp;·&nbsp;
+    Arraste para rotacionar &nbsp;·&nbsp;
+    Scroll para zoom
+  </div>
+
+  <!-- ── Tooltip de hover ──────────────────────────────────── -->
+  <div id="tooltip"></div>
+
+  <!-- ── Painel lateral de status ──────────────────────────── -->
+  <div id="panel">
+    <div id="panel-header">
+      <div id="panel-brand">WEG Industrial</div>
+      <div id="panel-name">—</div>
+      <div id="panel-model">—</div>
+      <div id="panel-close">✕</div>
+    </div>
+
+    <div id="panel-status-bar">
+      <div class="status-pill pill-ok">
+        <div class="sp-val">ONLINE</div>
+        <div class="sp-lbl">DeviceNet</div>
+      </div>
+      <div class="status-pill pill-info">
+        <div class="sp-val" id="pill-mac-val">—</div>
+        <div class="sp-lbl">MAC ID</div>
+      </div>
+      <div class="status-pill pill-ok">
+        <div class="sp-val" id="pill-run-val">RUN</div>
+        <div class="sp-lbl">Estado</div>
+      </div>
+    </div>
+
+    <div id="panel-body">
+      <div class="section-title">Dados em Tempo Real</div>
+      <div id="realtime-rows"></div>
+
+      <div class="section-title">Parâmetros DeviceNet</div>
+      <div id="dn-rows"></div>
+
+      <div class="section-title">Consumo de Rede</div>
+      <div id="gauges"></div>
+
+      <div class="section-title">Log de Eventos</div>
+      <div id="log-term"></div>
+    </div>
+  </div>
+
+  <!-- ── Three.js (CDN) ────────────────────────────────────── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- ── Módulos da aplicação (ordem importa) ──────────────── -->
+  <script src="js/textures.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/devices.js"></script>
+  <script src="js/network.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>
